@@ -3,4 +3,4 @@
 - API Docs: https://api-docs.poloniex.com/
 
 # Notes
-- Authenticated requests only implemented via socket connection
+- 
