@@ -13,7 +13,7 @@ using Poloniex.Net.Objects.Options;
 namespace Poloniex.Net.Clients.ExchangeApi
 {
     /// <inheritdoc cref="IPoloniexRestClientExchangeApi" />
-    internal partial class PoloniexRestClientExchangeApi : RestApiClient, IPoloniexRestClientExchangeApi
+    internal partial class PoloniexRestClientExchangeApi : RestApiClient<PoloniexEnvironment, PoloniexAuthenticationProvider, HMACCredential>, IPoloniexRestClientExchangeApi
     {
         protected override IRestMessageHandler MessageHandler { get; } = new PoloniexRestMessageHandler();
 
@@ -43,7 +43,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             => new SystemTextJsonMessageSerializer(SerializerOptions.WithConverters(PoloniexExchange.SerializerContext));
 
         /// <inheritdoc />
-        protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
+        protected override PoloniexAuthenticationProvider CreateAuthenticationProvider(HMACCredential credentials)
             => new PoloniexAuthenticationProvider(credentials);
 
         internal Task<WebCallResult<T>> SendAsync<T>(RequestDefinition definition, ParameterCollection? parameters, CancellationToken cancellationToken, int? weight = null) where T : class

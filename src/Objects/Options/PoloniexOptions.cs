@@ -6,7 +6,7 @@ namespace Poloniex.Net.Objects.Options
     /// <summary>
     /// CryptoCom options
     /// </summary>
-    public class PoloniexOptions : LibraryOptions<PoloniexRestOptions, PoloniexSocketOptions, ApiCredentials, PoloniexEnvironment>
+    public class PoloniexOptions : LibraryOptions<PoloniexRestOptions, PoloniexSocketOptions, HMACCredential, PoloniexEnvironment>
     {
     }
 }

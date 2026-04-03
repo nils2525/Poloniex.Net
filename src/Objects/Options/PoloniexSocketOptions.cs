@@ -1,3 +1,4 @@
+using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.Objects.Options;
 
 namespace Poloniex.Net.Objects.Options
@@ -5,7 +6,7 @@ namespace Poloniex.Net.Objects.Options
     /// <summary>
     /// Options for the CryptoComSocketClient
     /// </summary>
-    public class PoloniexSocketOptions : SocketExchangeOptions<PoloniexEnvironment>
+    public class PoloniexSocketOptions : SocketExchangeOptions<PoloniexEnvironment, HMACCredential>
     {
         /// <summary>
         /// Default options for new clients

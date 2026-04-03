@@ -11,7 +11,7 @@ using Poloniex.Net.Objects.Options;
 namespace Poloniex.Net.Clients
 {
     /// <inheritdoc cref="IPoloniexSocketClient" />
-    public class PoloniexSocketClient : BaseSocketClient, IPoloniexSocketClient
+    public class PoloniexSocketClient : BaseSocketClient<PoloniexEnvironment, HMACCredential>, IPoloniexSocketClient
     {
         #region fields
         #endregion
@@ -49,12 +49,6 @@ namespace Poloniex.Net.Clients
         }
         #endregion
 
-        /// <inheritdoc />
-        public void SetOptions(UpdateOptions options)
-        {
-            ExchangeApi.SetOptions(options);
-        }
-
         /// <summary>
         /// Set the default options to be used when creating new clients
         /// </summary>
@@ -62,14 +56,6 @@ namespace Poloniex.Net.Clients
         public static void SetDefaultOptions(Action<PoloniexSocketOptions> optionsDelegate)
         {
             PoloniexSocketOptions.Default = ApplyOptionsDelegate(optionsDelegate);
-        }
-
-        /// <inheritdoc />
-        public void SetApiCredentials(ApiCredentials credentials)
-        {
-
-            ExchangeApi.SetApiCredentials(credentials);
-
         }
     }
 }

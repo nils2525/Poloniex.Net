@@ -11,7 +11,7 @@ using Poloniex.Net.Objects.Options;
 namespace Poloniex.Net.Clients
 {
     /// <inheritdoc cref="IPoloniexRestClient" />
-    public class PoloniexRestClient : BaseRestClient, IPoloniexRestClient
+    public class PoloniexRestClient : BaseRestClient<PoloniexEnvironment, HMACCredential>, IPoloniexRestClient
     {
         #region Api clients
 
@@ -48,12 +48,6 @@ namespace Poloniex.Net.Clients
 
         #endregion
 
-        /// <inheritdoc />
-        public void SetOptions(UpdateOptions options)
-        {
-            ExchangeApi.SetOptions(options);
-        }
-
         /// <summary>
         /// Set the default options to be used when creating new clients
         /// </summary>
@@ -61,14 +55,6 @@ namespace Poloniex.Net.Clients
         public static void SetDefaultOptions(Action<PoloniexRestOptions> optionsDelegate)
         {
             PoloniexRestOptions.Default = ApplyOptionsDelegate(optionsDelegate);
-        }
-
-        /// <inheritdoc />
-        public void SetApiCredentials(ApiCredentials credentials)
-        {
-
-            ExchangeApi.SetApiCredentials(credentials);
-
         }
     }
 }

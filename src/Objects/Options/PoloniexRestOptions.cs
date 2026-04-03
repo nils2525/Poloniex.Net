@@ -1,3 +1,4 @@
+using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.Objects.Options;
 
 namespace Poloniex.Net.Objects.Options
@@ -5,7 +6,7 @@ namespace Poloniex.Net.Objects.Options
     /// <summary>
     /// Options for the CryptoComRestClient
     /// </summary>
-    public class PoloniexRestOptions : RestExchangeOptions<PoloniexEnvironment>
+    public class PoloniexRestOptions : RestExchangeOptions<PoloniexEnvironment, HMACCredential>
     {
         public TimeSpan ReceiveWindow { get; set; } = TimeSpan.FromSeconds(5);
 

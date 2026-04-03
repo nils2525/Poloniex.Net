@@ -43,14 +43,14 @@ namespace Poloniex.Net.Clients
         }
 
         /// <inheritdoc />
-        public void InitializeUserClient(string userIdentifier, ApiCredentials credentials, PoloniexEnvironment? environment = null)
+        public void InitializeUserClient(string userIdentifier, HMACCredential credentials, PoloniexEnvironment? environment = null)
         {
             CreateRestClient(userIdentifier, credentials, environment);
             CreateSocketClient(userIdentifier, credentials, environment);
         }
 
         /// <inheritdoc />
-        public IPoloniexRestClient GetRestClient(string userIdentifier, ApiCredentials? credentials = null, PoloniexEnvironment? environment = null)
+        public IPoloniexRestClient GetRestClient(string userIdentifier, HMACCredential? credentials = null, PoloniexEnvironment? environment = null)
         {
             if (!_restClients.TryGetValue(userIdentifier, out var client))
                 client = CreateRestClient(userIdentifier, credentials, environment);
@@ -59,7 +59,7 @@ namespace Poloniex.Net.Clients
         }
 
         /// <inheritdoc />
-        public IPoloniexSocketClient GetSocketClient(string userIdentifier, ApiCredentials? credentials = null, PoloniexEnvironment? environment = null)
+        public IPoloniexSocketClient GetSocketClient(string userIdentifier, HMACCredential? credentials = null, PoloniexEnvironment? environment = null)
         {
             if (!_socketClients.TryGetValue(userIdentifier, out var client))
                 client = CreateSocketClient(userIdentifier, credentials, environment);
@@ -67,7 +67,7 @@ namespace Poloniex.Net.Clients
             return client;
         }
 
-        private IPoloniexRestClient CreateRestClient(string userIdentifier, ApiCredentials? credentials, PoloniexEnvironment? environment)
+        private IPoloniexRestClient CreateRestClient(string userIdentifier, HMACCredential? credentials, PoloniexEnvironment? environment)
         {
             var clientRestOptions = SetRestEnvironment(environment);
             var client = new PoloniexRestClient(_httpClient, _loggerFactory, clientRestOptions);
@@ -79,7 +79,7 @@ namespace Poloniex.Net.Clients
             return client;
         }
 
-        private IPoloniexSocketClient CreateSocketClient(string userIdentifier, ApiCredentials? credentials, PoloniexEnvironment? environment)
+        private IPoloniexSocketClient CreateSocketClient(string userIdentifier, HMACCredential? credentials, PoloniexEnvironment? environment)
         {
             var clientSocketOptions = SetSocketEnvironment(environment);
             var client = new PoloniexSocketClient(clientSocketOptions!, _loggerFactory);

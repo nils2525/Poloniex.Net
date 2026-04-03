@@ -7,11 +7,11 @@ using Poloniex.Net.Objects.Options;
 
 namespace Poloniex.Net
 {
-    internal class PoloniexAuthenticationProvider : AuthenticationProvider
+    internal class PoloniexAuthenticationProvider : AuthenticationProvider<HMACCredential>
     {
-        public override ApiCredentialsType[] SupportedCredentialTypes { get; } = [ApiCredentialsType.Hmac];
+        public override string Key => ApiCredentials.Key;
 
-        public PoloniexAuthenticationProvider(ApiCredentials credentials) : base(credentials)
+        public PoloniexAuthenticationProvider(HMACCredential credentials) : base(credentials)
         { }
 
         public override void ProcessRequest(RestApiClient apiClient, RestRequestConfiguration requestConfig)
@@ -25,7 +25,7 @@ namespace Poloniex.Net
             var options = (PoloniexRestOptions)apiClient.ClientOptions;
 
             requestConfig.Headers ??= new Dictionary<string, string>();
-            requestConfig.Headers["key"] = _credentials.Key;
+            requestConfig.Headers["key"] = ApiCredentials.Key;
             requestConfig.Headers["signTimestamp"] = timestamp;
             requestConfig.Headers["recvWindow"] = options.ReceiveWindow.TotalMilliseconds.ToString();
 
@@ -41,12 +41,12 @@ namespace Poloniex.Net
                 requestConfig.Path + "\n" +
                 contentParameters.CreateParamString(requestConfig.BodyParameters?.Any() != true, ArrayParametersSerialization.MultipleValues);
 
-            requestConfig.Headers["signature"] = SignHMACSHA256(signatureText, SignOutputType.Base64);
+            requestConfig.Headers["signature"] = SignHMACSHA256(ApiCredentials, signatureText, SignOutputType.Base64);
         }
 
         public ParameterCollection AuthenticateSocket()
         {
-            var key = _credentials.Key;
+            var key = ApiCredentials.Key;
             var timestamp = DateTimeConverter.ConvertToMilliseconds(DateTime.UtcNow);
             var signatureText =
                 "GET" + "\n" +
@@ -57,7 +57,7 @@ namespace Poloniex.Net
             {
                 { "key", key},
                 { "signTimestamp", timestamp},
-                { "signature", SignHMACSHA256(signatureText, SignOutputType.Base64)}
+                { "signature", SignHMACSHA256(ApiCredentials, signatureText, SignOutputType.Base64)}
             };
         }
     }

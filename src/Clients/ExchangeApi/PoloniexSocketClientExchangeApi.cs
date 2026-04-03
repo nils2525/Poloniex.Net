@@ -25,7 +25,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
     /// <summary>
     /// Client providing access to the CryptoCom Exchange websocket Api
     /// </summary>
-    internal partial class PoloniexSocketClientExchangeApi : SocketApiClient, IPoloniexSocketClientExchangeApi
+    internal partial class PoloniexSocketClientExchangeApi : SocketApiClient<PoloniexEnvironment, PoloniexAuthenticationProvider, HMACCredential>, IPoloniexSocketClientExchangeApi
     {
         #region constructor/destructor
 
@@ -55,7 +55,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             => new SystemTextJsonMessageSerializer(SerializerOptions.WithConverters(PoloniexExchange.SerializerContext));
 
         /// <inheritdoc />
-        protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
+        protected override PoloniexAuthenticationProvider CreateAuthenticationProvider(HMACCredential credentials)
             => new PoloniexAuthenticationProvider(credentials);
 
         /// <inheritdoc />

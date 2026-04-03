@@ -109,8 +109,6 @@ namespace Microsoft.Extensions.DependencyInjection
             }).SetHandlerLifetime(Timeout.InfiniteTimeSpan);
             services.Add(new ServiceDescriptor(typeof(IPoloniexSocketClient), x => { return new PoloniexSocketClient(x.GetRequiredService<IOptions<PoloniexSocketOptions>>(), x.GetRequiredService<ILoggerFactory>()); }, socketClientLifeTime ?? ServiceLifetime.Singleton));
 
-            services.AddTransient<ICryptoRestClient, CryptoRestClient>();
-            services.AddSingleton<ICryptoSocketClient, CryptoSocketClient>();
             services.AddSingleton<IPoloniexUserClientProvider, PoloniexUserClientProvider>(x =>
             new PoloniexUserClientProvider(
                 x.GetRequiredService<IHttpClientFactory>().CreateClient(typeof(IPoloniexRestClient).Name),
