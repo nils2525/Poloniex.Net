@@ -3,6 +3,7 @@ using CryptoExchange.Net.Sockets;
 using CryptoExchange.Net.Sockets.Default;
 using Poloniex.Net.Objects.Internal;
 using Poloniex.Net.Objects.Sockets.Subscriptions;
+using CryptoExchange.Net.Sockets.Default.Routing;
 
 namespace Poloniex.Net.Objects.Sockets
 {
