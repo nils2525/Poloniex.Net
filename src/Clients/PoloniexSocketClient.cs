@@ -22,6 +22,9 @@ namespace Poloniex.Net.Clients
         /// <inheritdoc />
         public IPoloniexSocketClientExchangeApi ExchangeApi { get; }
 
+        /// <inheritdoc />
+        public IPoloniexSocketClientFuturesApi FuturesApi { get; }
+
 
         #endregion
 
@@ -46,6 +49,7 @@ namespace Poloniex.Net.Clients
             Initialize(options.Value);
 
             ExchangeApi = AddApiClient(new PoloniexSocketClientExchangeApi(_logger, options.Value));
+            FuturesApi = AddApiClient(new PoloniexSocketClientFuturesApi(_logger, options.Value));
         }
         #endregion
 

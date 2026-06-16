@@ -16,5 +16,10 @@ namespace Poloniex.Net.Interfaces.Clients
         /// Exchange API endpoints
         /// </summary>
         public IPoloniexRestClientExchangeApi ExchangeApi { get; }
+
+        /// <summary>
+        /// Futures API endpoints
+        /// </summary>
+        public IPoloniexRestClientFuturesApi FuturesApi { get; }
     }
 }
