@@ -8,8 +8,8 @@ namespace Poloniex.Net.Objects.Sockets
     {
         public PoloniexPingQuery(bool authenticated, int weight = 1) : base(new PoloniexSocketRequest("ping"), authenticated, weight)
         {
-            MessageRouter = MessageRouter.CreateWithoutTopicFilter<PoloniexSocketSubscriptionResponse>("pong",
-                (_, _, _, message) => new CryptoExchange.Net.Objects.CallResult<PoloniexSocketSubscriptionResponse>(message));
+            MessageRouter = MessageRouter.CreateForQuery<PoloniexSocketSubscriptionResponse>("pong",
+                (_, _, originalData, message) => CryptoExchange.Net.Objects.CallResult.Ok(message, originalData));
         }
     }
 }

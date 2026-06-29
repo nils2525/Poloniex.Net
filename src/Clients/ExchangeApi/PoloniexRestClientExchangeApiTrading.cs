@@ -21,9 +21,9 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
-        public async Task<WebCallResult<PoloniexOrderId>> PlaceOrderAsync(string symbol, PoloniexTradeSide side, PoloniexOrderType type, decimal price, decimal quantity, string? clientOrderId = null, CancellationToken ct = default)
+        public async Task<HttpResult<PoloniexOrderId>> PlaceOrderAsync(string symbol, PoloniexTradeSide side, PoloniexOrderType type, decimal price, decimal quantity, string? clientOrderId = null, CancellationToken ct = default)
         {
-            var parameters = new ParameterCollection();
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
             parameters.Add("symbol", symbol);
             parameters.AddEnum("side", side);
             parameters.AddEnum("type", type);
@@ -37,7 +37,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
-        public async Task<WebCallResult<PoloniexCancelOrderResult>> CancelOrderAsync(string orderId, CancellationToken ct = default)
+        public async Task<HttpResult<PoloniexCancelOrderResult>> CancelOrderAsync(string orderId, CancellationToken ct = default)
         {
             var request = _definitions.GetOrCreate(HttpMethod.Delete, $"orders/{orderId}", PoloniexExchange.RateLimiter.RestPrivate, 1, true);
             var result = await _baseClient.SendAsync<PoloniexCancelOrderResult>(request, null, ct);
@@ -47,29 +47,29 @@ namespace Poloniex.Net.Clients.ExchangeApi
             return result;
         }
 
-        public Task<WebCallResult<PoloniexOrder[]>> GetOpenOrdersAsync(string? symbol = null, CancellationToken ct = default)
+        public Task<HttpResult<PoloniexOrder[]>> GetOpenOrdersAsync(string? symbol = null, CancellationToken ct = default)
         {
-            var parameters = new ParameterCollection();
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
             parameters.AddOptional("symbol", symbol);
             var request = _definitions.GetOrCreate(HttpMethod.Get, $"orders", PoloniexExchange.RateLimiter.RestPrivateSpecific, 1, true);
             return _baseClient.SendAsync<PoloniexOrder[]>(request, parameters, ct);
         }
 
-        public Task<WebCallResult<PoloniexOrder>> GetOrderByIdAsync(string orderId, CancellationToken ct = default)
+        public Task<HttpResult<PoloniexOrder>> GetOrderByIdAsync(string orderId, CancellationToken ct = default)
         {
             var request = _definitions.GetOrCreate(HttpMethod.Get, $"orders/{orderId}", PoloniexExchange.RateLimiter.RestPrivate, 1, true);
             return _baseClient.SendAsync<PoloniexOrder>(request, null, ct);
         }
 
-        public Task<WebCallResult<PoloniexOrderTrade[]>> GetOrderTradesAsync(string orderId, CancellationToken ct = default)
+        public Task<HttpResult<PoloniexOrderTrade[]>> GetOrderTradesAsync(string orderId, CancellationToken ct = default)
         {
             var request = _definitions.GetOrCreate(HttpMethod.Get, $"orders/{orderId}/trades", PoloniexExchange.RateLimiter.RestPrivate, 1, true);
             return _baseClient.SendAsync<PoloniexOrderTrade[]>(request, null, ct);
         }
 
-        public Task<WebCallResult<PoloniexOrderTrade[]>> GetOrderTradeHistoryAsync(int? limit = null, DateTime? startTime = null, DateTime? endTime = null, long? from = null, PoloniexPageDirection? pageDirection = null, string[]? symbols = null, CancellationToken ct = default)
+        public Task<HttpResult<PoloniexOrderTrade[]>> GetOrderTradeHistoryAsync(int? limit = null, DateTime? startTime = null, DateTime? endTime = null, long? from = null, PoloniexPageDirection? pageDirection = null, string[]? symbols = null, CancellationToken ct = default)
         {
-            var parameters = new ParameterCollection();
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
             parameters.AddOptional("limit", limit);
             parameters.AddOptionalMilliseconds("startTime", startTime);
             parameters.AddOptionalMilliseconds("endTime", endTime);

@@ -15,7 +15,7 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         /// <param name="symbol">Symbol</param>
         /// <param name="onMessage">Update handler</param>
         /// <param name="ct">Cancellation token</param>
-        Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default);
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default);
 
         /// <summary>
         /// Subscribe to futures trade updates.
@@ -23,6 +23,6 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         /// <param name="symbols">Symbols</param>
         /// <param name="onMessage">Update handler</param>
         /// <param name="ct">Cancellation token</param>
-        Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default);
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default);
     }
 }

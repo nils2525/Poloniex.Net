@@ -15,6 +15,12 @@ namespace Poloniex.Net
     public static class PoloniexExchange
     {
         internal static PoloniexSourceGenerationContext SerializerContext { get; } = new();
+        internal static readonly ParameterSerializationSettings _parameterSerializationSettings = new()
+        {
+            Decimal = DecimalSerialization.String,
+            Array = ArrayParametersSerialization.MultipleValues,
+            Sort = false
+        };
 
         /// <summary>
         /// Exchange name

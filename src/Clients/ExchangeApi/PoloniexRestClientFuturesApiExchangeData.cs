@@ -17,9 +17,9 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
-        public async Task<WebCallResult<PoloniexFuturesInstrument[]>> GetInstrumentsAsync(string? symbol = null, CancellationToken ct = default)
+        public async Task<HttpResult<PoloniexFuturesInstrument[]>> GetInstrumentsAsync(string? symbol = null, CancellationToken ct = default)
         {
-            var parameters = new ParameterCollection();
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
             parameters.AddOptional("symbol", symbol);
             var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/market/allInstruments", PoloniexExchange.RateLimiter.RestPublicSpecific, 1, false);
             var result = await _baseClient.SendAsync<PoloniexFuturesRestResult<PoloniexFuturesInstrument[]>>(request, parameters, ct).ConfigureAwait(false);

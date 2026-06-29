@@ -19,10 +19,10 @@ namespace Poloniex.Net.Clients.ExchangeApi
         /// <inheritdoc />
         public IPoloniexRestClientFuturesApiExchangeData ExchangeData { get; }
 
-        internal PoloniexRestClientFuturesApi(ILogger logger, HttpClient? httpClient, PoloniexRestOptions options)
-            : base(logger, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
+        internal PoloniexRestClientFuturesApi(ILoggerFactory? loggerFactory, HttpClient? httpClient, PoloniexRestOptions options)
+            : base(loggerFactory, PoloniexExchange.ExchangeName, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
         {
-            ExchangeData = new PoloniexRestClientFuturesApiExchangeData(logger, this);
+            ExchangeData = new PoloniexRestClientFuturesApiExchangeData(_logger, this);
         }
 
         /// <inheritdoc />
@@ -33,18 +33,19 @@ namespace Poloniex.Net.Clients.ExchangeApi
         protected override PoloniexAuthenticationProvider CreateAuthenticationProvider(HMACCredential credentials)
             => new PoloniexAuthenticationProvider(credentials);
 
-        internal async Task<WebCallResult<T>> SendAsync<T>(RequestDefinition definition, ParameterCollection? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
+        internal async Task<HttpResult<T>> SendAsync<T>(RequestDefinition definition, Parameters? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
         {
-            var result = await base.SendAsync<T>(BaseAddress, definition, parameters, cancellationToken, null, weight).ConfigureAwait(false);
-            if (!result)
-                return result.As<T>(default);
+            definition.BaseAddress = BaseAddress;
+            var result = await base.SendAsync<T>(definition, parameters, cancellationToken, null, weight).ConfigureAwait(false);
+            if (!result.Success)
+                return HttpResult.Fail<T>(result);
 
             return result;
         }
 
         /// <inheritdoc />
-        protected override Task<WebCallResult<DateTime>> GetServerTimestampAsync()
-            => Task.FromResult(new WebCallResult<DateTime>(null, null, null, null, null, null, null, null, null, null, null, ResultDataSource.Server, DateTime.UtcNow, null));
+        protected override Task<HttpResult<DateTime>> GetServerTimestampAsync()
+            => Task.FromResult(new HttpResult<DateTime>(PoloniexExchange.ExchangeName, DateTime.UtcNow, null));
 
         /// <inheritdoc />
         public override string FormatSymbol(string baseAsset, string quoteAsset, CryptoExchange.Net.SharedApis.TradingMode tradingMode, DateTime? deliverTime = null)

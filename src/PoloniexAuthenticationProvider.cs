@@ -16,7 +16,7 @@ namespace Poloniex.Net
 
         public override void ProcessRequest(RestApiClient apiClient, RestRequestConfiguration requestConfig)
         {
-            if (!requestConfig.Authenticated)
+            if (!requestConfig.RequestDefinition.Authenticated)
                 return;
 
             // https://api-docs.poloniex.com/spot/api/#authentication
@@ -29,22 +29,31 @@ namespace Poloniex.Net
             requestConfig.Headers["signTimestamp"] = timestamp;
             requestConfig.Headers["recvWindow"] = options.ReceiveWindow.TotalMilliseconds.ToString();
 
-            requestConfig.QueryParameters ??= new Dictionary<string, object>();
+            requestConfig.QueryParameters ??= new Parameters(PoloniexExchange._parameterSerializationSettings);
             var contentParameters = requestConfig.QueryParameters;
             contentParameters.Add("signTimestamp", timestamp);
 
             // Sort parameters
-            contentParameters = contentParameters.OrderBy(c => c.Key).ToDictionary(c => c.Key, c => c.Value);
+            var sortedParameters = new Parameters(new ParameterSerializationSettings
+            {
+                Decimal = DecimalSerialization.String,
+                Array = ArrayParametersSerialization.MultipleValues,
+                Sort = true
+            });
+            foreach (var parameter in contentParameters.OrderBy(c => c.Key))
+                sortedParameters.Add(parameter.Key, parameter.Value);
+            contentParameters = sortedParameters;
+            requestConfig.QueryParameters = sortedParameters;
 
             var signatureText =
-                requestConfig.Method + "\n" +
-                requestConfig.Path + "\n" +
+                requestConfig.RequestDefinition.Method + "\n" +
+                requestConfig.RequestDefinition.Path + "\n" +
                 contentParameters.CreateParamString(requestConfig.BodyParameters?.Any() != true, ArrayParametersSerialization.MultipleValues);
 
             requestConfig.Headers["signature"] = SignHMACSHA256(ApiCredentials, signatureText, SignOutputType.Base64);
         }
 
-        public ParameterCollection AuthenticateSocket()
+        public Parameters AuthenticateSocket()
         {
             var key = ApiCredentials.Key;
             var timestamp = DateTimeConverter.ConvertToMilliseconds(DateTime.UtcNow);
@@ -53,7 +62,7 @@ namespace Poloniex.Net
                 "/ws" + "\n" +
                 "signTimestamp=" + timestamp;
 
-            return new ParameterCollection()
+            return new Parameters(PoloniexExchange._parameterSerializationSettings)
             {
                 { "key", key},
                 { "signTimestamp", timestamp},

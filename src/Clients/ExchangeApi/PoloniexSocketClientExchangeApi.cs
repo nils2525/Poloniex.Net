@@ -32,8 +32,8 @@ namespace Poloniex.Net.Clients.ExchangeApi
         /// <summary>
         /// ctor
         /// </summary>
-        internal PoloniexSocketClientExchangeApi(ILogger logger, PoloniexSocketOptions options) :
-            base(logger, options.Environment.SocketClientAddress!, options, options.ExchangeOptions)
+        internal PoloniexSocketClientExchangeApi(ILoggerFactory? loggerFactory, PoloniexSocketOptions options) :
+            base(loggerFactory, PoloniexExchange.ExchangeName, options.Environment.SocketClientAddress!, options, options.ExchangeOptions)
         {
             RateLimiter = PoloniexExchange.RateLimiter.Socket;
             RegisterPeriodicQuery("pong", TimeSpan.FromSeconds(10), (c) => new PoloniexPingQuery(false), (connection, result) =>
@@ -63,7 +63,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             => new PoloniexSocketMessageHandler();
 
         /// <inheritdoc />
-        public async Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default)
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexTrade>>((receiveTime, originalData, data) =>
             {
@@ -84,7 +84,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
-        public Task<CallResult<UpdateSubscription>> SubscribeToCandleUpdatesAsync(string symbol, Action<DataEvent<PoloniexCandle[]>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToCandleUpdatesAsync(string symbol, Action<DataEvent<PoloniexCandle[]>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexCandle>>((receiveTime, originalData, data) =>
             {
@@ -105,7 +105,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
-        public Task<CallResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(string symbol, Action<DataEvent<PoloniexOrderBook[]>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(string symbol, Action<DataEvent<PoloniexOrderBook[]>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexOrderBook>>((receiveTime, originalData, data) =>
             {
@@ -125,7 +125,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             return SubscribeAsync(BaseAddress.AppendPath("public"), subscription, ct);
         }
 
-        public Task<CallResult<UpdateSubscription>> SubscribeToOrderUpdatesAsync(Action<DataEvent<PoloniexOrderUpdate[]>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderUpdatesAsync(Action<DataEvent<PoloniexOrderUpdate[]>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexOrderUpdate>>((receiveTime, originalData, data) =>
             {
@@ -144,7 +144,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             return SubscribeAsync(BaseAddress.AppendPath("private"), subscription, ct);
         }
 
-        public Task<CallResult<UpdateSubscription>> SubscribeToBalanceUpdatesAsync(Action<DataEvent<PoloniexBalanceUpdate[]>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToBalanceUpdatesAsync(Action<DataEvent<PoloniexBalanceUpdate[]>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexBalanceUpdate>>((receiveTime, originalData, data) =>
             {

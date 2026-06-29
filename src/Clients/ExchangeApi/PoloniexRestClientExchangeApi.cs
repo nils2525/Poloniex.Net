@@ -29,12 +29,12 @@ namespace Poloniex.Net.Clients.ExchangeApi
         #endregion
 
         #region constructor/destructor
-        internal PoloniexRestClientExchangeApi(ILogger logger, HttpClient? httpClient, PoloniexRestOptions options)
-            : base(logger, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
+        internal PoloniexRestClientExchangeApi(ILoggerFactory? loggerFactory, HttpClient? httpClient, PoloniexRestOptions options)
+            : base(loggerFactory, PoloniexExchange.ExchangeName, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
         {
             Account = new PoloniexRestClientExchangeApiAccount(this);
-            ExchangeData = new PoloniexRestClientExchangeApiExchangeData(logger, this);
-            Trading = new PoloniexRestClientExchangeApiTrading(logger, this);
+            ExchangeData = new PoloniexRestClientExchangeApiExchangeData(_logger, this);
+            Trading = new PoloniexRestClientExchangeApiTrading(_logger, this);
         }
         #endregion
 
@@ -46,20 +46,21 @@ namespace Poloniex.Net.Clients.ExchangeApi
         protected override PoloniexAuthenticationProvider CreateAuthenticationProvider(HMACCredential credentials)
             => new PoloniexAuthenticationProvider(credentials);
 
-        internal Task<WebCallResult<T>> SendAsync<T>(RequestDefinition definition, ParameterCollection? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
+        internal Task<HttpResult<T>> SendAsync<T>(RequestDefinition definition, Parameters? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
             => SendToAddressAsync<T>(BaseAddress, definition, parameters, cancellationToken, weight);
 
-        internal async Task<WebCallResult<T>> SendToAddressAsync<T>(string baseAddress, RequestDefinition definition, ParameterCollection? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
+        internal async Task<HttpResult<T>> SendToAddressAsync<T>(string baseAddress, RequestDefinition definition, Parameters? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
         {
-            var result = await base.SendAsync<T>(baseAddress, definition, parameters, cancellationToken, null, weight).ConfigureAwait(false);
-            if (!result)
-                return result.As<T>(default);
+            definition.BaseAddress = baseAddress;
+            var result = await base.SendAsync<T>(definition, parameters, cancellationToken, null, weight).ConfigureAwait(false);
+            if (!result.Success)
+                return HttpResult.Fail<T>(result);
 
             return result;
         }
 
         /// <inheritdoc />
-        protected override Task<WebCallResult<DateTime>> GetServerTimestampAsync()
+        protected override Task<HttpResult<DateTime>> GetServerTimestampAsync()
             => ExchangeData.GetServerTimeAsync();
 
         /// <inheritdoc />

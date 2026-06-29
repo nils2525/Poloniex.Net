@@ -26,9 +26,9 @@ namespace Poloniex.Net.Objects.Sockets.Subscriptions
             _symbols = symbols;
 
             if (symbols.Length == 1 && symbols[0] == AllSymbols)
-                MessageRouter = MessageRouter.CreateWithoutTopicFilter<PoloniexSubscriptionEvent<T>>(channel, DoHandleMessage);
+                MessageRouter = MessageRouter.CreateForEvent<PoloniexSubscriptionEvent<T>>(channel, DoHandleMessage);
             else
-                MessageRouter = MessageRouter.Create(symbols.Select(symbol => MessageRoute<PoloniexSubscriptionEvent<T>>.CreateWithTopicFilter(channel, symbol, DoHandleMessage)).ToArray());
+                MessageRouter = MessageRouter.Create(symbols.Select(symbol => MessageRoute.CreateForEvent<PoloniexSubscriptionEvent<T>>(channel, symbol, DoHandleMessage)).ToArray());
         }
 
         /// <inheritdoc />
@@ -62,7 +62,7 @@ namespace Poloniex.Net.Objects.Sockets.Subscriptions
         public CallResult DoHandleMessage(SocketConnection connection, DateTime receiveTime, string? originalData, PoloniexSubscriptionEvent<T> message)
         {
             _handler.Invoke(receiveTime, originalData, message);
-            return CallResult.SuccessResult;
+            return CallResult.Ok();
         }
     }
 }

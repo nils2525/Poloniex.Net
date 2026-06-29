@@ -24,8 +24,8 @@ namespace Poloniex.Net.Clients.ExchangeApi
     /// <inheritdoc cref="IPoloniexSocketClientFuturesApi" />
     internal class PoloniexSocketClientFuturesApi : SocketApiClient<PoloniexEnvironment, PoloniexAuthenticationProvider, HMACCredential>, IPoloniexSocketClientFuturesApi
     {
-        internal PoloniexSocketClientFuturesApi(ILogger logger, PoloniexSocketOptions options)
-            : base(logger, options.Environment.SocketClientAddress!, options, options.ExchangeOptions)
+        internal PoloniexSocketClientFuturesApi(ILoggerFactory? loggerFactory, PoloniexSocketOptions options)
+            : base(loggerFactory, PoloniexExchange.ExchangeName, options.Environment.SocketClientAddress!, options, options.ExchangeOptions)
         {
             RateLimiter = PoloniexExchange.RateLimiter.Socket;
             RegisterPeriodicQuery("pong", TimeSpan.FromSeconds(10), (c) => new PoloniexPingQuery(false), (connection, result) =>
@@ -51,11 +51,11 @@ namespace Poloniex.Net.Clients.ExchangeApi
             => new PoloniexSocketMessageHandler();
 
         /// <inheritdoc />
-        public Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default)
             => SubscribeToTradeUpdatesAsync([symbol], onMessage, ct);
 
         /// <inheritdoc />
-        public async Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default)
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default)
         {
             var symbolArray = symbols.ToArray();
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexFuturesTrade>>((receiveTime, originalData, data) =>

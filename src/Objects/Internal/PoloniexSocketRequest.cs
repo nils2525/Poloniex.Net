@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using CryptoExchange.Net.Objects;
 using Poloniex.Net.Objects.Sockets.Subscriptions;
 
@@ -22,7 +22,7 @@ namespace Poloniex.Net.Objects.Internal
         public string[] Symbols { get; set; } = [];
 
         [JsonPropertyName("params"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ParameterCollection? Parameters { get; set; }
+        public Parameters? Parameters { get; set; }
 
         public PoloniexSocketRequest()
         { }
