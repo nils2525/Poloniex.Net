@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Poloniex.Net.Objects.Internal;
 using Poloniex.Net.Objects.Models;
+using CryptoExchange.Net.Objects;
 
 namespace Poloniex.Net.Converters
 {
@@ -30,6 +31,7 @@ namespace Poloniex.Net.Converters
     [JsonSerializable(typeof(PoloniexOrderTrade[]))]
     [JsonSerializable(typeof(PoloniexWalletActivity))]
     [JsonSerializable(typeof(PoloniexAccountActivity[]))]
+    [JsonSerializable(typeof(Parameters))]
     internal partial class PoloniexSourceGenerationContext : JsonSerializerContext
     { }
 }
