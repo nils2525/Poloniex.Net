@@ -61,5 +61,8 @@ namespace Poloniex.Net.Objects.Models
 
         [JsonPropertyName("minConfirm")]
         public int MinConfirm { get; set; }
+
+        [JsonPropertyName("contractAddress")]
+        public string? ContractAddress { get; set; }
     }
 }
