@@ -18,6 +18,20 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default);
 
         /// <summary>
+        /// Subscribe to trade updates for multiple symbols, or pass <c>all</c> as the sole symbol
+        /// to subscribe to every market.
+        /// <para><a href="https://api-docs.poloniex.com/spot/websocket/#subscribe" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>
+        /// Subscribe to ticker updates for multiple symbols, or pass <c>all</c> as the sole symbol
+        /// to subscribe to every market.
+        /// <para><a href="https://api-docs.poloniex.com/spot/websocket/market-data#ticker" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexTicker[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>
         /// Subscribe to candle updates
         /// <para><a href="https://api-docs.poloniex.com/spot/websocket/market-data#candlesticks" /></para>
         /// </summary>

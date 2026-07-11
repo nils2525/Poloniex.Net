@@ -63,8 +63,13 @@ namespace Poloniex.Net.Clients.ExchangeApi
             => new PoloniexSocketMessageHandler();
 
         /// <inheritdoc />
-        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default)
+            => SubscribeToTradeUpdatesAsync([symbol], onMessage, ct);
+
+        /// <inheritdoc />
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexTrade[]>> onMessage, CancellationToken ct = default)
         {
+            var symbolArray = symbols.ToArray();
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexTrade>>((receiveTime, originalData, data) =>
             {
                 DateTime? timestamp = data.Data.Any() ? data.Data.Max(c => c.Timestamp) : null;
@@ -74,12 +79,34 @@ namespace Poloniex.Net.Clients.ExchangeApi
                 onMessage(
                     new DataEvent<PoloniexTrade[]>(PoloniexExchange.ExchangeName, data.Data, receiveTime, originalData)
                         .WithUpdateType(data.Action.ToCEN())
-                        .WithSymbol(symbol)
+                        .WithSymbol(data.Data.FirstOrDefault()?.Symbol)
                         .WithStreamId(data.Channel)
                         .WithDataTimestamp(timestamp, GetTimeOffset())
                     );
             });
-            var subscription = new PoloniexSubscription<PoloniexTrade>(_logger, "trades", [symbol], internalHandler, false);
+            var subscription = new PoloniexSubscription<PoloniexTrade>(_logger, "trades", symbolArray, internalHandler, false);
+            return await SubscribeAsync(BaseAddress.AppendPath("public"), subscription, ct).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexTicker[]>> onMessage, CancellationToken ct = default)
+        {
+            var symbolArray = symbols.ToArray();
+            var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexTicker>>((receiveTime, originalData, data) =>
+            {
+                DateTime? timestamp = data.Data.Any() ? data.Data.Max(c => c.Timestamp) : null;
+                if (timestamp.HasValue)
+                    UpdateTimeOffset(timestamp.Value);
+
+                onMessage(
+                    new DataEvent<PoloniexTicker[]>(PoloniexExchange.ExchangeName, data.Data, receiveTime, originalData)
+                        .WithUpdateType(data.Action.ToCEN())
+                        .WithSymbol(data.Data.FirstOrDefault()?.Symbol)
+                        .WithStreamId(data.Channel)
+                        .WithDataTimestamp(timestamp, GetTimeOffset())
+                    );
+            });
+            var subscription = new PoloniexSubscription<PoloniexTicker>(_logger, "ticker", symbolArray, internalHandler, false);
             return await SubscribeAsync(BaseAddress.AppendPath("public"), subscription, ct).ConfigureAwait(false);
         }
 

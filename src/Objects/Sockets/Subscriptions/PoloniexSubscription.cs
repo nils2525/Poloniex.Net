@@ -25,7 +25,10 @@ namespace Poloniex.Net.Objects.Sockets.Subscriptions
             _channel = channel;
             _symbols = symbols;
 
-            if (symbols.Length == 1 && symbols[0] == AllSymbols)
+            var isAllSymbols = symbols.Length == 1 && string.Equals(symbols[0], AllSymbols, StringComparison.OrdinalIgnoreCase);
+            IndividualSubscriptionCount = symbols.Length;
+
+            if (isAllSymbols)
                 MessageRouter = MessageRouter.CreateForEvent<PoloniexSubscriptionEvent<T>>(channel, DoHandleMessage);
             else
                 MessageRouter = MessageRouter.Create(symbols.Select(symbol => MessageRoute.CreateForEvent<PoloniexSubscriptionEvent<T>>(channel, symbol, DoHandleMessage)).ToArray());

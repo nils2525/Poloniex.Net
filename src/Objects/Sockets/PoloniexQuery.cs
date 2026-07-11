@@ -32,7 +32,8 @@ namespace Poloniex.Net.Objects.Sockets
         {
             var routers = request.Channels.Select(channel => MessageRoute.CreateForQuery<T>($"{request.Method}#{channel}", String.Join(",", request.Symbols.Order()), HandleMessage));
 
-            if (request.Symbols.Length == 1 && request.Symbols[0] == PoloniexSubscription<T>.AllSymbols)
+            if (request.Symbols.Length == 1 &&
+                string.Equals(request.Symbols[0], PoloniexSubscription<T>.AllSymbols, StringComparison.OrdinalIgnoreCase))
                 // Some channels response do not include the "ALL" symbol
                 routers = request.Channels.Select(channel => MessageRoute.CreateForQuery<T>($"{request.Method}#{channel}", HandleMessage));
 

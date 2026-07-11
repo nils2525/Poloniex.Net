@@ -80,6 +80,56 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesTicker[]>> onMessage, CancellationToken ct = default)
+        {
+            var symbolArray = symbols.ToArray();
+            var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexFuturesTicker>>((receiveTime, originalData, data) =>
+            {
+                DateTime? timestamp = data.Data.Length > 0 ? data.Data.Max(c => c.Timestamp) : null;
+                if (timestamp.HasValue)
+                    UpdateTimeOffset(timestamp.Value);
+
+                onMessage(
+                    new DataEvent<PoloniexFuturesTicker[]>(PoloniexExchange.ExchangeName, data.Data, receiveTime, originalData)
+                        .WithUpdateType(data.Action.ToCEN())
+                        .WithSymbol(data.Data.Length == 1 ? data.Data[0].Symbol : null)
+                        .WithStreamId(data.Channel)
+                        .WithDataTimestamp(timestamp, GetTimeOffset())
+                    );
+            });
+            var subscription = new PoloniexSubscription<PoloniexFuturesTicker>(_logger, "tickers", symbolArray, internalHandler, false)
+            {
+                IndividualSubscriptionCount = symbolArray.Length
+            };
+            return await SubscribeAsync(BaseAddress.AppendPath("v3/public"), subscription, ct).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToIndexPriceUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesIndexPrice[]>> onMessage, CancellationToken ct = default)
+        {
+            var symbolArray = symbols.ToArray();
+            var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexFuturesIndexPrice>>((receiveTime, originalData, data) =>
+            {
+                DateTime? timestamp = data.Data.Length > 0 ? data.Data.Max(c => c.Timestamp) : null;
+                if (timestamp.HasValue)
+                    UpdateTimeOffset(timestamp.Value);
+
+                onMessage(
+                    new DataEvent<PoloniexFuturesIndexPrice[]>(PoloniexExchange.ExchangeName, data.Data, receiveTime, originalData)
+                        .WithUpdateType(data.Action.ToCEN())
+                        .WithSymbol(data.Data.Length == 1 ? data.Data[0].Symbol : null)
+                        .WithStreamId(data.Channel)
+                        .WithDataTimestamp(timestamp, GetTimeOffset())
+                    );
+            });
+            var subscription = new PoloniexSubscription<PoloniexFuturesIndexPrice>(_logger, "index_price", symbolArray, internalHandler, false)
+            {
+                IndividualSubscriptionCount = symbolArray.Length
+            };
+            return await SubscribeAsync(BaseAddress.AppendPath("v3/public"), subscription, ct).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
         protected override Task<Query?> GetAuthenticationRequestAsync(SocketConnection connection)
             => Task.FromResult<Query?>(null);
 

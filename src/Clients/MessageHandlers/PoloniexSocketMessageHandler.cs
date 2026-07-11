@@ -21,7 +21,10 @@ namespace Poloniex.Net.Clients.MessageHandlers
         {
             AddTopicMapping<PoloniexSocketSubscriptionResponse>(r => String.Join(",", r.Symbols.Order()));
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexTrade>>(c => c.Data.First().Symbol);
+            AddTopicMapping<PoloniexSubscriptionEvent<PoloniexTicker>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesTrade>>(c => c.Data.First().Symbol);
+            AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesTicker>>(c => c.Data.First().Symbol);
+            AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesIndexPrice>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexCandle>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexOrderBook>>(c => c.Data.First().Symbol);
         }
