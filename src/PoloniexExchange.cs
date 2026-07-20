@@ -23,6 +23,20 @@ namespace Poloniex.Net
         };
 
         /// <summary>
+        /// Creates the headers required for Poloniex REST requests.
+        /// </summary>
+        /// <param name="cryptoExchangeLibVersion">The CryptoExchange.Net version identifying the client.</param>
+        /// <returns>The standard REST request headers.</returns>
+        internal static Dictionary<string, string> CreateRestRequestHeaders(Version cryptoExchangeLibVersion)
+        {
+            // Poloniex's CloudFront edge rejects REST requests that omit the User-Agent header.
+            return new Dictionary<string, string>
+            {
+                { "User-Agent", "CryptoExchange.Net/" + cryptoExchangeLibVersion }
+            };
+        }
+
+        /// <summary>
         /// Exchange name
         /// </summary>
         public static string ExchangeName => "Poloniex";

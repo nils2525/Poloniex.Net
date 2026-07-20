@@ -46,8 +46,8 @@ namespace Poloniex.Net.Clients
         {
             Initialize(options.Value);
 
-            ExchangeApi = AddApiClient(new PoloniexRestClientExchangeApi(loggerFactory, httpClient, options.Value));
-            FuturesApi = AddApiClient(new PoloniexRestClientFuturesApi(loggerFactory, httpClient, options.Value));
+            ExchangeApi = AddApiClient(new PoloniexRestClientExchangeApi(this, loggerFactory, httpClient, options.Value));
+            FuturesApi = AddApiClient(new PoloniexRestClientFuturesApi(this, loggerFactory, httpClient, options.Value));
         }
 
         #endregion

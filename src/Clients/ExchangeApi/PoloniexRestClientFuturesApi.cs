@@ -19,10 +19,18 @@ namespace Poloniex.Net.Clients.ExchangeApi
         /// <inheritdoc />
         public IPoloniexRestClientFuturesApiExchangeData ExchangeData { get; }
 
-        internal PoloniexRestClientFuturesApi(ILoggerFactory? loggerFactory, HttpClient? httpClient, PoloniexRestOptions options)
+        /// <summary>
+        /// Initializes the Poloniex futures REST API client.
+        /// </summary>
+        /// <param name="baseClient">The owning Poloniex REST client.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="httpClient">The HTTP client.</param>
+        /// <param name="options">The REST client options.</param>
+        internal PoloniexRestClientFuturesApi(PoloniexRestClient baseClient, ILoggerFactory? loggerFactory, HttpClient? httpClient, PoloniexRestOptions options)
             : base(loggerFactory, PoloniexExchange.ExchangeName, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
         {
             ExchangeData = new PoloniexRestClientFuturesApiExchangeData(_logger, this);
+            StandardRequestHeaders = PoloniexExchange.CreateRestRequestHeaders(baseClient.CryptoExchangeLibVersion);
         }
 
         /// <inheritdoc />

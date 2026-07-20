@@ -29,12 +29,21 @@ namespace Poloniex.Net.Clients.ExchangeApi
         #endregion
 
         #region constructor/destructor
-        internal PoloniexRestClientExchangeApi(ILoggerFactory? loggerFactory, HttpClient? httpClient, PoloniexRestOptions options)
+
+        /// <summary>
+        /// Initializes the Poloniex spot REST API client.
+        /// </summary>
+        /// <param name="baseClient">The owning Poloniex REST client.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="httpClient">The HTTP client.</param>
+        /// <param name="options">The REST client options.</param>
+        internal PoloniexRestClientExchangeApi(PoloniexRestClient baseClient, ILoggerFactory? loggerFactory, HttpClient? httpClient, PoloniexRestOptions options)
             : base(loggerFactory, PoloniexExchange.ExchangeName, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
         {
             Account = new PoloniexRestClientExchangeApiAccount(this);
             ExchangeData = new PoloniexRestClientExchangeApiExchangeData(_logger, this);
             Trading = new PoloniexRestClientExchangeApiTrading(_logger, this);
+            StandardRequestHeaders = PoloniexExchange.CreateRestRequestHeaders(baseClient.CryptoExchangeLibVersion);
         }
         #endregion
 
