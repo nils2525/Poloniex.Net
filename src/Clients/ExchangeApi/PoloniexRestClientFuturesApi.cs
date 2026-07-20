@@ -30,7 +30,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             : base(loggerFactory, PoloniexExchange.ExchangeName, httpClient, options.Environment.RestClientAddress, options, options.ExchangeOptions)
         {
             ExchangeData = new PoloniexRestClientFuturesApiExchangeData(_logger, this);
-            StandardRequestHeaders = PoloniexExchange.CreateRestRequestHeaders(baseClient.CryptoExchangeLibVersion);
+            StandardRequestHeaders = PoloniexExchange.CreateRequestHeaders(baseClient.CryptoExchangeLibVersion);
         }
 
         /// <inheritdoc />

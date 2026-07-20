@@ -43,7 +43,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             Account = new PoloniexRestClientExchangeApiAccount(this);
             ExchangeData = new PoloniexRestClientExchangeApiExchangeData(_logger, this);
             Trading = new PoloniexRestClientExchangeApiTrading(_logger, this);
-            StandardRequestHeaders = PoloniexExchange.CreateRestRequestHeaders(baseClient.CryptoExchangeLibVersion);
+            StandardRequestHeaders = PoloniexExchange.CreateRequestHeaders(baseClient.CryptoExchangeLibVersion);
         }
         #endregion
 

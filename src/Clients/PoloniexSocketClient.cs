@@ -48,8 +48,8 @@ namespace Poloniex.Net.Clients
         {
             Initialize(options.Value);
 
-            ExchangeApi = AddApiClient(new PoloniexSocketClientExchangeApi(loggerFactory, options.Value));
-            FuturesApi = AddApiClient(new PoloniexSocketClientFuturesApi(loggerFactory, options.Value));
+            ExchangeApi = AddApiClient(new PoloniexSocketClientExchangeApi(this, loggerFactory, options.Value));
+            FuturesApi = AddApiClient(new PoloniexSocketClientFuturesApi(this, loggerFactory, options.Value));
         }
         #endregion
 

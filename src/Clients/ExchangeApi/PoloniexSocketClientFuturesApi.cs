@@ -24,9 +24,12 @@ namespace Poloniex.Net.Clients.ExchangeApi
     /// <inheritdoc cref="IPoloniexSocketClientFuturesApi" />
     internal class PoloniexSocketClientFuturesApi : SocketApiClient<PoloniexEnvironment, PoloniexAuthenticationProvider, HMACCredential>, IPoloniexSocketClientFuturesApi
     {
-        internal PoloniexSocketClientFuturesApi(ILoggerFactory? loggerFactory, PoloniexSocketOptions options)
+        private readonly PoloniexSocketClient _baseClient;
+
+        internal PoloniexSocketClientFuturesApi(PoloniexSocketClient baseClient, ILoggerFactory? loggerFactory, PoloniexSocketOptions options)
             : base(loggerFactory, PoloniexExchange.ExchangeName, options.Environment.SocketClientAddress!, options, options.ExchangeOptions)
         {
+            _baseClient = baseClient;
             RateLimiter = PoloniexExchange.RateLimiter.Socket;
             RegisterPeriodicQuery("pong", TimeSpan.FromSeconds(10), (c) => new PoloniexPingQuery(false), (connection, result) =>
             {
@@ -41,6 +44,16 @@ namespace Poloniex.Net.Clients.ExchangeApi
         /// <inheritdoc />
         protected override IMessageSerializer CreateSerializer()
             => new SystemTextJsonMessageSerializer(SerializerOptions.WithConverters(PoloniexExchange.SerializerContext));
+
+        /// <inheritdoc />
+        protected override WebSocketParameters GetWebSocketParameters(string address)
+        {
+            var parameters = base.GetWebSocketParameters(address);
+            foreach (var header in PoloniexExchange.CreateRequestHeaders(_baseClient.CryptoExchangeLibVersion))
+                parameters.Headers[header.Key] = header.Value;
+
+            return parameters;
+        }
 
         /// <inheritdoc />
         protected override PoloniexAuthenticationProvider CreateAuthenticationProvider(HMACCredential credentials)
