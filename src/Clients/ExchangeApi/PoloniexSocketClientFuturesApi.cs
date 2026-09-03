@@ -196,6 +196,13 @@ namespace Poloniex.Net.Clients.ExchangeApi
         }
 
         /// <inheritdoc />
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToAccountUpdatesAsync(
+            IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesAccountBalance[]>> onMessage,
+            CancellationToken ct = default)
+            => SubscribeToPrivateUpdatesAsync("account", symbols, onMessage,
+                account => account.Timestamp ?? account.UpdateTime, ct);
+
+        /// <inheritdoc />
         public Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderUpdatesAsync(
             IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesOrder[]>> onMessage,
             CancellationToken ct = default)

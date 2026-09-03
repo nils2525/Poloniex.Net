@@ -36,6 +36,7 @@ namespace Poloniex.Net.Converters
     [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesTicker>))]
     [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesIndexPrice>))]
     [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesFundingRate>))]
+    [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesAccountBalance>))]
     [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesOrder>))]
     [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesOrderTrade>))]
     [JsonSerializable(typeof(PoloniexSubscriptionEvent<PoloniexFuturesPosition>))]

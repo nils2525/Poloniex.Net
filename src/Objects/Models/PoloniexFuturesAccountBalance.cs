@@ -36,6 +36,9 @@ namespace Poloniex.Net.Objects.Models
         /// <summary>[<c>uTime</c>] Update time.</summary>
         [JsonPropertyName("uTime"), JsonConverter(typeof(DateTimeConverter))]
         public DateTime UpdateTime { get; set; }
+        /// <summary>[<c>ts</c>] Event timestamp.</summary>
+        [JsonPropertyName("ts"), JsonConverter(typeof(DateTimeConverter))]
+        public DateTime? Timestamp { get; set; }
         /// <summary>[<c>details</c>] Per-currency balances.</summary>
         [JsonPropertyName("details")]
         public PoloniexFuturesAccountBalanceDetail[] Details { get; set; } = [];

@@ -49,6 +49,12 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         Task<WebSocketResult<UpdateSubscription>> SubscribeToFundingRateUpdatesAsync(IEnumerable<string> symbols,
             Action<DataEvent<PoloniexFuturesFundingRate[]>> onMessage, CancellationToken ct = default);
 
+        /// <summary>Subscribe to private futures account-balance updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/private/account" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToAccountUpdatesAsync(IEnumerable<string> symbols,
+            Action<DataEvent<PoloniexFuturesAccountBalance[]>> onMessage, CancellationToken ct = default);
+
         /// <summary>Subscribe to private futures order updates.
         /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/private/orders" /></para>
         /// </summary>
