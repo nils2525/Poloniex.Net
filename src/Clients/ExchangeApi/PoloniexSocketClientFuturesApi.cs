@@ -64,6 +64,35 @@ namespace Poloniex.Net.Clients.ExchangeApi
             => new PoloniexSocketMessageHandler();
 
         /// <inheritdoc />
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesOrderBook[]>> onMessage, CancellationToken ct = default)
+            => SubscribeToOrderBookUpdatesAsync([symbol], onMessage, ct);
+
+        /// <inheritdoc />
+        public async Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesOrderBook[]>> onMessage, CancellationToken ct = default)
+        {
+            var symbolArray = symbols.ToArray();
+            var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexFuturesOrderBook>>((receiveTime, originalData, data) =>
+            {
+                DateTime? timestamp = data.Data.Length > 0 ? data.Data.Max(c => c.Timestamp) : null;
+                if (timestamp.HasValue)
+                    UpdateTimeOffset(timestamp.Value);
+
+                onMessage(
+                    new DataEvent<PoloniexFuturesOrderBook[]>(PoloniexExchange.ExchangeName, data.Data, receiveTime, originalData)
+                        .WithUpdateType(data.Action.ToCEN())
+                        .WithSymbol(data.Data.Length == 1 ? data.Data[0].Symbol : null)
+                        .WithStreamId(data.Channel)
+                        .WithDataTimestamp(timestamp, GetTimeOffset())
+                    );
+            });
+            var subscription = new PoloniexSubscription<PoloniexFuturesOrderBook>(_logger, "book_lv2", symbolArray, internalHandler, false)
+            {
+                IndividualSubscriptionCount = symbolArray.Length
+            };
+            return await SubscribeAsync(BaseAddress.AppendPath("v3/public"), subscription, ct).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
         public Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesTrade[]>> onMessage, CancellationToken ct = default)
             => SubscribeToTradeUpdatesAsync([symbol], onMessage, ct);
 

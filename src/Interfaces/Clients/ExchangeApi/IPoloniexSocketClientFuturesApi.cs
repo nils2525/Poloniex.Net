@@ -10,6 +10,24 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
     public interface IPoloniexSocketClientFuturesApi
     {
         /// <summary>
+        /// Subscribe to futures level 2 order book updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/public/get-order-book-v2" /></para>
+        /// </summary>
+        /// <param name="symbol">Symbol</param>
+        /// <param name="onMessage">Update handler</param>
+        /// <param name="ct">Cancellation token</param>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(string symbol, Action<DataEvent<PoloniexFuturesOrderBook[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>
+        /// Subscribe to futures level 2 order book updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/public/get-order-book-v2" /></para>
+        /// </summary>
+        /// <param name="symbols">Symbols</param>
+        /// <param name="onMessage">Update handler</param>
+        /// <param name="ct">Cancellation token</param>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesOrderBook[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>
         /// Subscribe to futures trade updates.
         /// </summary>
         /// <param name="symbol">Symbol</param>
