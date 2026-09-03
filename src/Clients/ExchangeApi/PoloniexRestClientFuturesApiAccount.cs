@@ -1,5 +1,6 @@
 using CryptoExchange.Net.Objects;
 using Poloniex.Net.Enums;
+using Poloniex.Net.ExtensionMethods;
 using Poloniex.Net.Interfaces.Clients.ExchangeApi;
 using Poloniex.Net.Objects.Models;
 
@@ -22,6 +23,24 @@ namespace Poloniex.Net.Clients.ExchangeApi
             var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/account/balance",
                 PoloniexExchange.RateLimiter.FuturesBalance, 1, true);
             return _baseClient.SendFuturesAsync<PoloniexFuturesAccountBalance>(request, null, ct);
+        }
+
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexFuturesBill[]>> GetBillsAsync(DateTime? startTime = null,
+            DateTime? endTime = null, string? from = null, int? limit = null,
+            PoloniexPageDirection? direction = null, PoloniexFuturesBillType? type = null,
+            CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.AddOptionalMilliseconds("sTime", startTime);
+            parameters.AddOptionalMilliseconds("eTime", endTime);
+            parameters.AddOptional("from", from);
+            parameters.AddOptional("limit", limit);
+            parameters.AddOptional("direct", direction?.ToFuturesValue());
+            parameters.AddOptionalEnum("type", type);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/account/bills",
+                PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
+            return _baseClient.SendFuturesAsync<PoloniexFuturesBill[]>(request, parameters, ct);
         }
 
         /// <inheritdoc />

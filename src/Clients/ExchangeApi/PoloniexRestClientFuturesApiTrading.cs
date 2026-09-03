@@ -1,5 +1,6 @@
 using CryptoExchange.Net.Objects;
 using Poloniex.Net.Enums;
+using Poloniex.Net.ExtensionMethods;
 using Poloniex.Net.Interfaces.Clients.ExchangeApi;
 using Poloniex.Net.Objects.Models;
 
@@ -27,7 +28,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             parameters.Add("symbol", symbol);
             // V3 futures requires upper-case BUY/SELL, while the shared spot enum
             // intentionally serializes lower-case values.
-            parameters.Add("side", side is PoloniexTradeSide.Buy ? "BUY" : "SELL");
+            parameters.Add("side", side.ToFuturesValue());
             parameters.AddEnum("mgnMode", marginMode);
             parameters.AddEnum("posSide", positionSide);
             parameters.AddEnum("type", type);
@@ -69,7 +70,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             parameters.AddOptional("clOrdId", clientOrderId);
             parameters.AddOptional("from", from);
             parameters.AddOptional("limit", limit);
-            parameters.AddOptionalEnum("direct", direction);
+            parameters.AddOptional("direct", direction?.ToFuturesValue());
             var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/trade/order/opens",
                 PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
             return _baseClient.SendFuturesAsync<PoloniexFuturesOrder[]>(request, parameters, ct);
@@ -99,10 +100,56 @@ namespace Poloniex.Net.Clients.ExchangeApi
             parameters.AddOptional("clOrdId", clientOrderId);
             parameters.AddOptional("from", from);
             parameters.AddOptional("limit", limit);
-            parameters.AddOptionalEnum("direct", direction);
+            parameters.AddOptional("direct", direction?.ToFuturesValue());
             var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/trade/order/trades",
                 PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
             return _baseClient.SendFuturesAsync<PoloniexFuturesOrderTrade[]>(request, parameters, ct);
+        }
+
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexFuturesOrderTrade[]>> GetOrderTradeHistoryAsync(
+            PoloniexTradeSide? side = null, string? symbol = null, string? orderId = null,
+            string? clientOrderId = null, DateTime? startTime = null, DateTime? endTime = null,
+            string? from = null, int? limit = null, PoloniexPageDirection? direction = null,
+            CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.AddOptional("side", side?.ToFuturesValue());
+            parameters.AddOptional("symbol", symbol);
+            parameters.AddOptional("ordId", orderId);
+            parameters.AddOptional("clOrdId", clientOrderId);
+            parameters.AddOptionalMilliseconds("sTime", startTime);
+            parameters.AddOptionalMilliseconds("eTime", endTime);
+            parameters.AddOptional("from", from);
+            parameters.AddOptional("limit", limit);
+            parameters.AddOptional("direct", direction?.ToFuturesValue());
+            var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/trade/order/trades",
+                PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
+            return _baseClient.SendFuturesAsync<PoloniexFuturesOrderTrade[]>(request, parameters, ct);
+        }
+
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexFuturesOrder[]>> GetOrderHistoryAsync(string? symbol = null,
+            PoloniexTradeSide? side = null, string? orderId = null, string? clientOrderId = null,
+            PoloniexOrderState? state = null, PoloniexOrderType? type = null,
+            DateTime? startTime = null, DateTime? endTime = null, string? from = null,
+            int? limit = null, PoloniexPageDirection? direction = null, CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.AddOptional("symbol", symbol);
+            parameters.AddOptional("side", side?.ToFuturesValue());
+            parameters.AddOptional("ordId", orderId);
+            parameters.AddOptional("clOrdId", clientOrderId);
+            parameters.AddOptionalEnum("state", state);
+            parameters.AddOptionalEnum("type", type);
+            parameters.AddOptionalMilliseconds("sTime", startTime);
+            parameters.AddOptionalMilliseconds("eTime", endTime);
+            parameters.AddOptional("from", from);
+            parameters.AddOptional("limit", limit);
+            parameters.AddOptional("direct", direction?.ToFuturesValue());
+            var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/trade/order/history",
+                PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
+            return _baseClient.SendFuturesAsync<PoloniexFuturesOrder[]>(request, parameters, ct);
         }
 
         /// <inheritdoc />
@@ -114,6 +161,27 @@ namespace Poloniex.Net.Clients.ExchangeApi
             var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/trade/position/opens",
                 PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
             return _baseClient.SendFuturesAsync<PoloniexFuturesPosition[]>(request, parameters, ct);
+        }
+
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexFuturesPositionHistory[]>> GetPositionHistoryAsync(
+            string? symbol = null, PoloniexFuturesMarginMode? marginMode = null,
+            PoloniexFuturesPositionSide? positionSide = null, DateTime? startTime = null,
+            DateTime? endTime = null, string? from = null, int? limit = null,
+            PoloniexPageDirection? direction = null, CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.AddOptional("symbol", symbol);
+            parameters.AddOptionalEnum("mgnMode", marginMode);
+            parameters.AddOptionalEnum("posSide", positionSide);
+            parameters.AddOptionalMilliseconds("sTime", startTime);
+            parameters.AddOptionalMilliseconds("eTime", endTime);
+            parameters.AddOptional("from", from);
+            parameters.AddOptional("limit", limit);
+            parameters.AddOptional("direct", direction?.ToFuturesValue());
+            var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/trade/position/history",
+                PoloniexExchange.RateLimiter.FuturesPrivate, 1, true);
+            return _baseClient.SendFuturesAsync<PoloniexFuturesPositionHistory[]>(request, parameters, ct);
         }
 
         /// <inheritdoc />

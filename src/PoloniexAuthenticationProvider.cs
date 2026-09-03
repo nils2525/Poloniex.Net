@@ -59,9 +59,10 @@ namespace Poloniex.Net
             {
                 Decimal = DecimalSerialization.String,
                 Array = ArrayParametersSerialization.MultipleValues,
-                Sort = true
+                Sort = true,
+                SortComparer = StringComparer.Ordinal
             });
-            foreach (var parameter in contentParameters.OrderBy(c => c.Key))
+            foreach (var parameter in contentParameters.OrderBy(c => c.Key, StringComparer.Ordinal))
                 sortedParameters.Add(parameter.Key, parameter.Value);
             contentParameters = sortedParameters;
             if (!hasBody)

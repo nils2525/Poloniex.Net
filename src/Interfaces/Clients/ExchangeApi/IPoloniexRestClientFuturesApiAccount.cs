@@ -12,6 +12,14 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         /// </summary>
         Task<HttpResult<PoloniexFuturesAccountBalance>> GetBalancesAsync(CancellationToken ct = default);
 
+        /// <summary>Get Futures account bills, including fees, PnL, funding, transfers, and credits.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/account/bills" /></para>
+        /// </summary>
+        Task<HttpResult<PoloniexFuturesBill[]>> GetBillsAsync(DateTime? startTime = null,
+            DateTime? endTime = null, string? from = null, int? limit = null,
+            PoloniexPageDirection? direction = null, PoloniexFuturesBillType? type = null,
+            CancellationToken ct = default);
+
         /// <summary>Get the account-wide position mode.
         /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/positions/position-mode-get" /></para>
         /// </summary>

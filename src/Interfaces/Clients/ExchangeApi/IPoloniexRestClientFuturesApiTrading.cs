@@ -41,11 +41,38 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
             string? orderId = null, string? clientOrderId = null, string? from = null, int? limit = null,
             PoloniexPageDirection? direction = null, CancellationToken ct = default);
 
+        /// <summary>Get historical Futures order executions with side and time filters.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/trade/get-execution-details" /></para>
+        /// </summary>
+        Task<HttpResult<PoloniexFuturesOrderTrade[]>> GetOrderTradeHistoryAsync(
+            PoloniexTradeSide? side = null, string? symbol = null, string? orderId = null,
+            string? clientOrderId = null, DateTime? startTime = null, DateTime? endTime = null,
+            string? from = null, int? limit = null, PoloniexPageDirection? direction = null,
+            CancellationToken ct = default);
+
+        /// <summary>Get historical Futures orders.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/trade/get-order-history" /></para>
+        /// </summary>
+        Task<HttpResult<PoloniexFuturesOrder[]>> GetOrderHistoryAsync(string? symbol = null,
+            PoloniexTradeSide? side = null, string? orderId = null, string? clientOrderId = null,
+            PoloniexOrderState? state = null, PoloniexOrderType? type = null,
+            DateTime? startTime = null, DateTime? endTime = null, string? from = null,
+            int? limit = null, PoloniexPageDirection? direction = null, CancellationToken ct = default);
+
         /// <summary>Get current futures positions.
         /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/positions/get-current-position" /></para>
         /// </summary>
         Task<HttpResult<PoloniexFuturesPosition[]>> GetOpenPositionsAsync(string? symbol = null,
             CancellationToken ct = default);
+
+        /// <summary>Get historical Futures positions.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/positions/get-position-history" /></para>
+        /// </summary>
+        Task<HttpResult<PoloniexFuturesPositionHistory[]>> GetPositionHistoryAsync(string? symbol = null,
+            PoloniexFuturesMarginMode? marginMode = null,
+            PoloniexFuturesPositionSide? positionSide = null, DateTime? startTime = null,
+            DateTime? endTime = null, string? from = null, int? limit = null,
+            PoloniexPageDirection? direction = null, CancellationToken ct = default);
 
         /// <summary>Close a futures position at market.
         /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/api/trade/close-at-market-price" /></para>
