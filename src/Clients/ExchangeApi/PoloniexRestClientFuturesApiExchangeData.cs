@@ -22,8 +22,27 @@ namespace Poloniex.Net.Clients.ExchangeApi
             var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
             parameters.AddOptional("symbol", symbol);
             var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/market/allInstruments", PoloniexExchange.RateLimiter.RestPublicSpecific, 1, false);
-            var result = await _baseClient.SendAsync<PoloniexFuturesRestResult<PoloniexFuturesInstrument[]>>(request, parameters, ct).ConfigureAwait(false);
-            return result.As<PoloniexFuturesInstrument[]>(result.Data?.Data);
+            return await _baseClient.SendFuturesAsync<PoloniexFuturesInstrument[]>(request, parameters, ct).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexFuturesTicker[]>> GetTickersAsync(string? symbol = null, CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.AddOptional("symbol", symbol);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/market/tickers",
+                PoloniexExchange.RateLimiter.RestPublicSpecific, 1, false);
+            return _baseClient.SendFuturesAsync<PoloniexFuturesTicker[]>(request, parameters, ct);
+        }
+
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexFuturesFundingRate>> GetFundingRateAsync(string symbol, CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.Add("symbol", symbol);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, "v3/market/fundingRate",
+                PoloniexExchange.RateLimiter.RestPublicSpecific, 1, false);
+            return _baseClient.SendFuturesAsync<PoloniexFuturesFundingRate>(request, parameters, ct);
         }
     }
 }

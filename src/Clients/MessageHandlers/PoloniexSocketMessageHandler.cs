@@ -25,6 +25,7 @@ namespace Poloniex.Net.Clients.MessageHandlers
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesTrade>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesTicker>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesIndexPrice>>(c => c.Data.First().Symbol);
+            AddTopicMapping<PoloniexSubscriptionEvent<PoloniexFuturesFundingRate>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexCandle>>(c => c.Data.First().Symbol);
             AddTopicMapping<PoloniexSubscriptionEvent<PoloniexOrderBook>>(c => c.Data.First().Symbol);
         }

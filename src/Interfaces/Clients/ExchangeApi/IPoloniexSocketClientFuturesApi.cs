@@ -42,5 +42,29 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         /// <param name="onMessage">Update handler.</param>
         /// <param name="ct">Cancellation token.</param>
         Task<WebSocketResult<UpdateSubscription>> SubscribeToIndexPriceUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexFuturesIndexPrice[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>Subscribe to predicted futures funding-rate updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/public/get-funding-rate" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToFundingRateUpdatesAsync(IEnumerable<string> symbols,
+            Action<DataEvent<PoloniexFuturesFundingRate[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>Subscribe to private futures order updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/private/orders" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderUpdatesAsync(IEnumerable<string> symbols,
+            Action<DataEvent<PoloniexFuturesOrder[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>Subscribe to private futures position updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/private/positions" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToPositionUpdatesAsync(IEnumerable<string> symbols,
+            Action<DataEvent<PoloniexFuturesPosition[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>Subscribe to private futures execution updates.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/v3/futures/websocket/private/trade" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToUserTradeUpdatesAsync(IEnumerable<string> symbols,
+            Action<DataEvent<PoloniexFuturesOrderTrade[]>> onMessage, CancellationToken ct = default);
     }
 }

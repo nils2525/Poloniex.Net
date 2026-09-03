@@ -70,6 +70,10 @@ namespace Poloniex.Net.Objects.Models
         [JsonPropertyName("aSz")]
         public decimal BestAskQuantity { get; set; }
 
+        /// <summary>[<c>mPx</c>] Mark price.</summary>
+        [JsonPropertyName("mPx")]
+        public decimal MarkPrice { get; set; }
+
         /// <summary>[<c>ts</c>] Push timestamp.</summary>
         [JsonPropertyName("ts")]
         [JsonConverter(typeof(DateTimeConverter))]

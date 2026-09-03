@@ -22,6 +22,21 @@ namespace Poloniex.Net.Clients.ExchangeApi
             return _baseClient.SendAsync<PoloniexAccountBalance[]>(request, null, ct);
         }
 
+        /// <inheritdoc />
+        public Task<HttpResult<PoloniexAccountTransfer>> TransferAsync(string currency, decimal amount,
+            string fromAccount, string toAccount, CancellationToken ct = default)
+        {
+            var parameters = new Parameters(PoloniexExchange._parameterSerializationSettings);
+            parameters.Add("currency", currency);
+            parameters.Add("amount", amount);
+            parameters.Add("fromAccount", fromAccount);
+            parameters.Add("toAccount", toAccount);
+            var request = _definitions.GetOrCreate(HttpMethod.Post, "accounts/transfer",
+                PoloniexExchange.RateLimiter.RestPrivate, 1, true,
+                parameterPosition: HttpMethodParameterPosition.InBody);
+            return _baseClient.SendAsync<PoloniexAccountTransfer>(request, parameters, ct);
+        }
+
         public Task<HttpResult<PoloniexAccount[]>> GetAccountDetailsAsync(CancellationToken ct = default)
         {
             var request = _definitions.GetOrCreate(HttpMethod.Get, "accounts", PoloniexExchange.RateLimiter.RestPrivate, 1, true);

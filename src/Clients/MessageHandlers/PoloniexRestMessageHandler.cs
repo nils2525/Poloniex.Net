@@ -23,7 +23,11 @@ namespace Poloniex.Net.Clients.MessageHandlers
                 return parseError;
 
             var code = document!.RootElement.TryGetProperty("code", out var codeProp) ? codeProp.GetRawText() : null;
-            var msg = document.RootElement.TryGetProperty("message", out var msgProp) ? msgProp.GetString() : null;
+            var msg = document.RootElement.TryGetProperty("message", out var msgProp)
+                ? msgProp.GetString()
+                : document.RootElement.TryGetProperty("msg", out msgProp)
+                    ? msgProp.GetString()
+                    : null;
 
             return new ServerError(code ?? String.Empty, new(ErrorType.Unknown, msg ?? String.Empty));
 

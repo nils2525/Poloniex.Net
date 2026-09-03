@@ -2,6 +2,7 @@ using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.Clients;
 using CryptoExchange.Net.Converters.SystemTextJson;
+using CryptoExchange.Net.Interfaces;
 using CryptoExchange.Net.Objects;
 using Poloniex.Net.Objects.Options;
 
@@ -9,6 +10,10 @@ namespace Poloniex.Net
 {
     internal class PoloniexAuthenticationProvider : AuthenticationProvider<HMACCredential>
     {
+        private static readonly IMessageSerializer _serializer =
+            new SystemTextJsonMessageSerializer(
+                SerializerOptions.WithConverters(PoloniexExchange.SerializerContext));
+
         public override string Key => ApiCredentials.Key;
 
         public PoloniexAuthenticationProvider(HMACCredential credentials) : base(credentials)
@@ -19,19 +24,35 @@ namespace Poloniex.Net
             if (!requestConfig.RequestDefinition.Authenticated)
                 return;
 
-            // https://api-docs.poloniex.com/spot/api/#authentication
-            var nonce = Guid.NewGuid().ToString();
+            // Spot and V3 Futures use the same HMAC-SHA256 signing scheme.
             var timestamp = GetMillisecondTimestamp(apiClient);
             var options = (PoloniexRestOptions)apiClient.ClientOptions;
 
             requestConfig.Headers ??= new Dictionary<string, string>();
             requestConfig.Headers["key"] = ApiCredentials.Key;
+            requestConfig.Headers["signatureMethod"] = "HmacSHA256";
+            requestConfig.Headers["signatureVersion"] = "2";
             requestConfig.Headers["signTimestamp"] = timestamp;
             requestConfig.Headers["recvWindow"] = options.ReceiveWindow.TotalMilliseconds.ToString();
 
-            requestConfig.QueryParameters ??= new Parameters(PoloniexExchange._parameterSerializationSettings);
-            var contentParameters = requestConfig.QueryParameters;
-            contentParameters.Add("signTimestamp", timestamp);
+            Parameters contentParameters;
+            var hasBody = requestConfig.BodyParameters?.Any() == true;
+            if (hasBody)
+            {
+                var body = GetSerializedBody(_serializer, requestConfig.BodyParameters);
+                requestConfig.SetBodyContent(body);
+                contentParameters = new Parameters(PoloniexExchange._parameterSerializationSettings)
+                {
+                    { "requestBody", body },
+                    { "signTimestamp", timestamp }
+                };
+            }
+            else
+            {
+                requestConfig.QueryParameters ??= new Parameters(PoloniexExchange._parameterSerializationSettings);
+                requestConfig.QueryParameters.Add("signTimestamp", timestamp);
+                contentParameters = requestConfig.QueryParameters;
+            }
 
             // Sort parameters
             var sortedParameters = new Parameters(new ParameterSerializationSettings
@@ -43,12 +64,13 @@ namespace Poloniex.Net
             foreach (var parameter in contentParameters.OrderBy(c => c.Key))
                 sortedParameters.Add(parameter.Key, parameter.Value);
             contentParameters = sortedParameters;
-            requestConfig.QueryParameters = sortedParameters;
+            if (!hasBody)
+                requestConfig.QueryParameters = sortedParameters;
 
             var signatureText =
                 requestConfig.RequestDefinition.Method + "\n" +
                 requestConfig.RequestDefinition.Path + "\n" +
-                contentParameters.CreateParamString(requestConfig.BodyParameters?.Any() != true, ArrayParametersSerialization.MultipleValues);
+                contentParameters.CreateParamString(!hasBody, ArrayParametersSerialization.MultipleValues);
 
             requestConfig.Headers["signature"] = SignHMACSHA256(ApiCredentials, signatureText, SignOutputType.Base64);
         }
@@ -66,6 +88,8 @@ namespace Poloniex.Net
             {
                 { "key", key},
                 { "signTimestamp", timestamp},
+                { "signatureMethod", "HmacSHA256"},
+                { "signatureVersion", "2"},
                 { "signature", SignHMACSHA256(ApiCredentials, signatureText, SignOutputType.Base64)}
             };
         }

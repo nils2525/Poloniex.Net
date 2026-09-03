@@ -7,10 +7,10 @@ namespace Poloniex.Net.Enums
     [JsonConverter(typeof(EnumConverter<PoloniexTradeSide>))]
     public enum PoloniexTradeSide
     {
-        [Map("buy")]
+        [Map("buy", "BUY")]
         Buy,
 
-        [Map("sell")]
+        [Map("sell", "SELL")]
         Sell
     }
 }

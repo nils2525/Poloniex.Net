@@ -20,6 +20,18 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         Task<HttpResult<PoloniexAccountBalance[]>> GetAccountBalancesAsync(CancellationToken ct = default);
 
         /// <summary>
+        /// Transfer funds between the Spot and Futures accounts.
+        /// <para>Docs: <a href="https://api-docs.poloniex.com/spot/api/private/account#accounts-transfer" /></para>
+        /// </summary>
+        /// <param name="currency">Currency.</param>
+        /// <param name="amount">Amount, with at most eight decimals.</param>
+        /// <param name="fromAccount">Source account, for example <c>SPOT</c>.</param>
+        /// <param name="toAccount">Destination account, for example <c>FUTURES</c>.</param>
+        /// <param name="ct">Cancellation token.</param>
+        Task<HttpResult<PoloniexAccountTransfer>> TransferAsync(string currency, decimal amount,
+            string fromAccount, string toAccount, CancellationToken ct = default);
+
+        /// <summary>
         /// <a href="https://api-docs.poloniex.com/spot/api/private/account#fee-info" />
         /// </summary>
         Task<HttpResult<PoloniexAccountFee>> GetFeeRatesAsync(CancellationToken ct = default);

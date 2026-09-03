@@ -10,7 +10,7 @@ using Poloniex.Net.Converters;
 namespace Poloniex.Net
 {
     /// <summary>
-    /// CryptoCom exchange information and configuration
+    /// Poloniex exchange information and configuration
     /// </summary>
     public static class PoloniexExchange
     {
@@ -60,7 +60,9 @@ namespace Poloniex.Net
         /// Urls to the API documentation
         /// </summary>
         public static string[] ApiDocsUrl { get; } = new[] {
-            "https://api-docs.poloniex.com/spot/api/"
+            "https://api-docs.poloniex.com/spot/api/",
+            "https://api-docs.poloniex.com/v3/futures/api/",
+            "https://api-docs.poloniex.com/v3/futures/websocket/"
             };
 
         /// <summary>
@@ -69,7 +71,7 @@ namespace Poloniex.Net
         public static ExchangeType Type { get; } = ExchangeType.CEX;
 
         /// <summary>
-        /// Format a base and quote asset to a Crypto.com recognized symbol 
+        /// Format a base and quote asset to a Poloniex-recognized symbol.
         /// </summary>
         /// <param name="baseAsset">Base asset</param>
         /// <param name="quoteAsset">Quote asset</param>
@@ -82,7 +84,7 @@ namespace Poloniex.Net
                 return $"{baseAsset.ToUpperInvariant()}_{quoteAsset.ToUpperInvariant()}";
 
             if (tradingMode.IsPerpetual())
-                return $"{baseAsset.ToUpperInvariant()}{quoteAsset.ToUpperInvariant()}-PERP";
+                return $"{baseAsset.ToUpperInvariant()}_{quoteAsset.ToUpperInvariant()}_PERP";
 
             if (deliverTime == null)
                 throw new ArgumentException("DeliverDate required to format delivery futures symbol");
@@ -91,13 +93,13 @@ namespace Poloniex.Net
         }
 
         /// <summary>
-        /// Rate limiter configuration for the CryptoCom API
+        /// Rate limiter configuration for the Poloniex API.
         /// </summary>
         public static CryptoComRateLimiters RateLimiter { get; } = new CryptoComRateLimiters();
     }
 
     /// <summary>
-    /// Rate limiter configuration for the CryptoCom API
+    /// Rate limiter configuration for the Poloniex API.
     /// </summary>
     public class CryptoComRateLimiters
     {
@@ -127,6 +129,23 @@ namespace Poloniex.Net
             RestPublicSpecific = new RateLimitGate("Rest Public Specific")
                 .AddGuard(new RateLimitGuard(RateLimitGuard.PerEndpoint, Array.Empty<IGuardFilter>(), 10, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding));
 
+            FuturesPrivate = new RateLimitGate("Futures Private")
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerApiKeyPerEndpoint,
+                    Array.Empty<IGuardFilter>(), 10, TimeSpan.FromSeconds(1),
+                    RateLimitWindowType.Sliding));
+            FuturesPlaceOrder = new RateLimitGate("Futures Place Order")
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerApiKeyPerEndpoint,
+                    Array.Empty<IGuardFilter>(), 50, TimeSpan.FromSeconds(1),
+                    RateLimitWindowType.Sliding));
+            FuturesCancelOrder = new RateLimitGate("Futures Cancel Order")
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerApiKeyPerEndpoint,
+                    Array.Empty<IGuardFilter>(), 100, TimeSpan.FromSeconds(1),
+                    RateLimitWindowType.Sliding));
+            FuturesBalance = new RateLimitGate("Futures Balance")
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerApiKeyPerEndpoint,
+                    Array.Empty<IGuardFilter>(), 50, TimeSpan.FromSeconds(1),
+                    RateLimitWindowType.Sliding));
+
             Socket = new RateLimitGate("Socket")
                 .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, [], 500, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding))
                 .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, [new LimitItemTypeFilter(RateLimitItemType.Request), new ExactPathFilter("/exchange/v1/user")], 150, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding));
@@ -134,6 +153,10 @@ namespace Poloniex.Net
             RestPrivateSpecific.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
             RestPublic.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
             RestPublicSpecific.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
+            FuturesPrivate.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
+            FuturesPlaceOrder.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
+            FuturesCancelOrder.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
+            FuturesBalance.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
             Socket.RateLimitTriggered += (x) => RateLimitTriggered?.Invoke(x);
         }
 
@@ -142,6 +165,10 @@ namespace Poloniex.Net
         internal IRateLimitGate RestPrivateSpecific { get; private set; }
         internal IRateLimitGate RestPublic { get; private set; }
         internal IRateLimitGate RestPublicSpecific { get; private set; }
+        internal IRateLimitGate FuturesPrivate { get; private set; }
+        internal IRateLimitGate FuturesPlaceOrder { get; private set; }
+        internal IRateLimitGate FuturesCancelOrder { get; private set; }
+        internal IRateLimitGate FuturesBalance { get; private set; }
         internal IRateLimitGate Socket { get; private set; }
 
     }

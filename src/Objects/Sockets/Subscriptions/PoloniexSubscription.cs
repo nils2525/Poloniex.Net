@@ -10,7 +10,7 @@ namespace Poloniex.Net.Objects.Sockets.Subscriptions
     /// <inheritdoc />
     internal class PoloniexSubscription<T> : Subscription
     {
-        public const string AllSymbols = "ALL";
+        public const string AllSymbols = "all";
 
         private readonly string _channel;
         private readonly string[] _symbols;
