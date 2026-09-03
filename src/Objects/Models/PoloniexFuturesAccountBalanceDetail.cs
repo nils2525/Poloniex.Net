@@ -33,6 +33,11 @@ namespace Poloniex.Net.Objects.Models
         /// <summary>[<c>isoUpl</c>] Isolated-position unrealized profit and loss.</summary>
         [JsonPropertyName("isoUpl")]
         public decimal IsolatedUnrealizedPnl { get; set; }
+        /// <summary>
+        /// Static wallet balance, including collateral held for trading and excluding unrealized profit and loss.
+        /// </summary>
+        [JsonIgnore]
+        public decimal Balance => Equity + IsolatedEquity - UnrealizedPnl - IsolatedUnrealizedPnl;
         /// <summary>[<c>im</c>] Initial margin.</summary>
         [JsonPropertyName("im")]
         public decimal InitialMargin { get; set; }
