@@ -165,6 +165,32 @@ namespace Poloniex.Net.Clients.ExchangeApi
             return SubscribeAsync(BaseAddress.AppendPath("public"), subscription, ct);
         }
 
+        /// <inheritdoc />
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookSnapshotUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexOrderBook[]>> onMessage, CancellationToken ct = default)
+        {
+            var symbolArray = symbols.ToArray();
+            var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexOrderBook>>((receiveTime, originalData, data) =>
+            {
+                DateTime? timestamp = null;
+                foreach (var book in data.Data)
+                {
+                    if (!timestamp.HasValue || book.Timestamp > timestamp.Value)
+                        timestamp = book.Timestamp;
+                }
+                if (timestamp.HasValue)
+                    UpdateTimeOffset(timestamp.Value);
+
+                // Unlike book_lv2, every book message is a complete snapshot and has no action field.
+                onMessage(new DataEvent<PoloniexOrderBook[]>(PoloniexExchange.ExchangeName, data.Data, receiveTime, originalData)
+                    .WithUpdateType(SocketUpdateType.Snapshot)
+                    .WithSymbol(data.Data.Length > 0 ? data.Data[0].Symbol : null)
+                    .WithStreamId(data.Channel)
+                    .WithDataTimestamp(timestamp, GetTimeOffset()));
+            });
+            var subscription = new PoloniexSubscription<PoloniexOrderBook>(_logger, "book", symbolArray, internalHandler, false);
+            return SubscribeAsync(BaseAddress.AppendPath("public"), subscription, ct);
+        }
+
         public Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderUpdatesAsync(Action<DataEvent<PoloniexOrderUpdate[]>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, PoloniexSubscriptionEvent<PoloniexOrderUpdate>>((receiveTime, originalData, data) =>

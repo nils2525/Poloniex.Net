@@ -3,8 +3,14 @@ using CryptoExchange.Net.Converters.SystemTextJson;
 
 namespace Poloniex.Net.Objects.Models
 {
+    /// <summary>Order book levels from the snapshot or incremental spot book channel.</summary>
     public class PoloniexOrderBook
     {
+        /// <summary>[<c>createTime</c>] Time the order book record was created.</summary>
+        [JsonPropertyName("createTime")]
+        [JsonConverter(typeof(DateTimeConverter))]
+        public DateTime? CreateTime { get; set; }
+
         [JsonPropertyName("ts")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime Timestamp { get; set; }

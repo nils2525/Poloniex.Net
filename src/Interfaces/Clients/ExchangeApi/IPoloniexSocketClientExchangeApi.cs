@@ -44,6 +44,13 @@ namespace Poloniex.Net.Interfaces.Clients.ExchangeApi
         Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(string symbol, Action<DataEvent<PoloniexOrderBook[]>> onMessage, CancellationToken ct = default);
 
         /// <summary>
+        /// Subscribe to complete five-level order book snapshots at 100 ms intervals for explicit symbols.
+        /// The <c>book</c> channel does not accept the <c>all</c> symbol.
+        /// <para><a href="https://api-docs.poloniex.com/spot/websocket/market-data#book" /></para>
+        /// </summary>
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookSnapshotUpdatesAsync(IEnumerable<string> symbols, Action<DataEvent<PoloniexOrderBook[]>> onMessage, CancellationToken ct = default);
+
+        /// <summary>
         /// Subscribe to candle updates
         /// <para><a href="https://api-docs.poloniex.com/spot/websocket/market-data#candlesticks" /></para>
         /// </summary>
