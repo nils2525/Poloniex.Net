@@ -24,7 +24,7 @@ namespace Poloniex.Net.Clients.ExchangeApi
             // No dedicated endpoint, use ticker endpoint which returns a timestamp
             var request = _definitions.GetOrCreate(HttpMethod.Get, "timestamp", PoloniexExchange.RateLimiter.RestPublic, 1, false);
             var result = await _baseClient.SendAsync<PoloniexTimestamp>(request, null, ct).ConfigureAwait(false);
-            return result.As(result.Data.Timestamp);
+            return result.Success ? HttpResult.Ok(result, result.Data.Timestamp) : HttpResult.Fail<DateTime>(result);
         }
 
         #endregion
